@@ -53,6 +53,9 @@ func main() {
 
 	flag.Var(&headers, "H", "Header (key:value)")
 	stream := flag.Bool("stream", false, "live response") // for streaming live response
+	method := flag.String("X", "GET", "http method")
+
+	data := flag.String("d", "", "request data")
 
 	flag.Parse()
 
@@ -60,10 +63,33 @@ func main() {
 		fmt.Println(errors.New(err.Error()))
 		return
 	}
-	
+
 	url := flag.Args()[0]
 
-	req, err := http.NewRequest("GET", url, nil) // initialising an http request
+	// validating whether method given is appropriate (only support for post and get for now)
+	uc := strings.ToUpper(*method)
+
+	var v string
+	if 	uc == http.MethodGet || uc == http.MethodPost {
+		// fmt.Println("not a valid method")
+		// return
+		v = uc
+	} else {
+		// v = uc
+		fmt.Println("not a valid method")
+		return
+	}
+
+	// body reader for post data
+	var body io.Reader
+
+	if *data != "" {
+		body = strings.NewReader(*data)
+	}
+
+	req, err := http.NewRequest(v, url, body)
+
+	// req, err := http.NewRequest("GET", url, nil) // initialising an http request
 	if err != nil {
 		log.Fatal(err.Error())
 		return
