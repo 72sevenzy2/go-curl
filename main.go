@@ -36,7 +36,7 @@ func main() {
 	url := flag.Args()[0]
 
 	// validating whether method given is appropriate (only support for post and get for now)
-	uc := strings.ToUpper(*method)
+	uc := strings.ToUpper(*method) // normalise request method input as all caps for easier comparison
 	var v string // holding actual method after validating if method is appropriate
 
 	// simplified
