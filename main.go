@@ -95,11 +95,7 @@ func main() {
 	defer resp.Body.Close() // important as not closing resp.Body would lead to performance issues + leaks, aswell as its apart of the ReadCloser interface so it has be closed.
 
 	if *stream {
-		var bf bytes.Buffer
-
-		tee := io.TeeReader(resp.Body, &bf)
-
-		_, err := io.Copy(os.Stdout, tee)
+		_, err := io.Copy(os.Stdout, resp.Body)
 		if err != nil {
 			log.Fatal(err.Error())
 			return
