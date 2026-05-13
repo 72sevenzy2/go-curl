@@ -137,7 +137,7 @@ func main() {
 		if err == nil {
 			fmt.Println(format.String())
 		} else {
-			fmt.Println(string(body))
+			fmt.Println(string(body), err.Error())
 		}
 	}
 }
