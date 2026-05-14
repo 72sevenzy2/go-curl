@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -23,6 +24,7 @@ func main() {
 	flag.Var(&headers, "H", "Header (key:value)")
 	stream := flag.Bool("stream", false, "live response") // for streaming live response
 	method := flag.String("x", "GET", "http method")
+	session := flag.Bool("session", false, "live interactive mode to store and receive variable-like data.")
 
 	data := flag.String("d", "", "request data")
 
@@ -71,6 +73,14 @@ func main() {
 	if err := AddHeaders(req, headers); err != nil {
 		fmt.Println(err.Error())
 		return
+	}
+
+	// session mode
+	if *session {
+		scanner := bufio.NewScanner(os.Stdin)
+		store := NewStore()
+
+		StartSession(scanner, store)
 	}
 
 	client := &http.Client{
