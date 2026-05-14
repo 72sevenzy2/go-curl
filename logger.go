@@ -14,11 +14,12 @@ func Log(v *http.Client, req *http.Request) (time.Duration, *http.Response, erro
 	}
 	end := time.Since(start)
 
-	fmt.Println("visited to:", req.URL.Path)
-	fmt.Println("method:", req.Method)
+	// fmt.Println("visited to:", req.URL.Path)
+	// fmt.Println("method:", req.Method)
+	fmt.Printf("visited to %s, with method %s", req.URL.Path, req.Method)
 	// request query
 	if req.URL.RawQuery != "" {
-		fmt.Println("query:", req.URL.RawQuery)
+		fmt.Println("with query:", req.URL.RawQuery)
 	}
 
 	fmt.Println("user details:")
