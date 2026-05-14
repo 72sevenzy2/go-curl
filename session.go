@@ -8,8 +8,8 @@ import (
 
 // start a interactive session
 func StartSession(b *bufio.Scanner, store *Data) {
+	fmt.Println("session started.")
 	for {
-		fmt.Println("session started.")
 		fmt.Print(">")
 		b.Scan() // take input
 
