@@ -2,45 +2,57 @@
 
 package main
 
-import "strconv"
+import (
+	"errors"
+	"strconv"
+)
 
-type Key interface {
-	string | int // only supports these 2 types for now
-}
-
-type Data[k Key] struct {
-	data_storage map[k]string // using generics to support only types string and int as key name.4
+type Data struct {
+	data_storage map[string]string // using generics to support only types string and int as key name.4
 }
 
 // new db
-func NewStore[k Key]() *Data[k] {
-	return &Data[k]{
-		make(map[k]string),
+func NewStore() *Data {
+	return &Data{
+		make(map[string]string),
+	}
+}
+
+// normalize key types to string
+func normalize(keyname any) (string, error) {
+	switch v := any(keyname).(type) {
+	case int:
+		return strconv.Itoa(v), nil
+	case string:
+		return v, nil
+	default:
+		errms := errors.New("invalid type: consider only string or int.")
+		return "", errms
 	}
 }
 
 // utility get/set functions for data map:
 
 // for strings
-func (d *Data[k]) Get(keyname k) (string, bool) {
-	// val, ok := d.data_storage[keyname]
-	// return val, ok
-	_, ok := any(keyname).(int)
-	if ok {
-		newKey := strconv.Itoa(any(keyname).(int))
-		val, ok := d.data_storage[any(newKey).(k)]
-		return val, ok
+func (d *Data) Get(keyname any) (string, bool) {
+	newKey, err := normalize(keyname)
+	if err != nil {
+		return err.Error(), false
 	}
-	value, ex := d.data_storage[keyname]
-	return value, ex
+
+	val, ok := d.data_storage[newKey]
+	return val, ok
 }
 
-func (d *Data[k]) Set(keyname k, value string) bool {
-	// validate if value exists first
-	if value != "" {
-		d.data_storage[keyname] = value
-		return true
-	} else {
-		return false // and then handle error from the module calling this method.
+func (d *Data) Set(keyname any, value string) bool {
+	if value == "" {
+		return false
 	}
+
+	newK, err := normalize(keyname)
+	if err != nil {
+		return false
+	}
+	d.data_storage[newK] = value
+	return true
 }

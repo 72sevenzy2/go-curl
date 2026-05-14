@@ -5,7 +5,7 @@ import (
 )
 
 func TestGet() {
-	store := NewStore[int]()
+	store := NewStore()
 	ok := store.Set(1, "test")
 	if ok {
 		fmt.Println("data set successfully")
