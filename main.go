@@ -22,7 +22,7 @@ func main() {
 	flag.Var(&headers, "H", "Header (key:value)")
 	stream := flag.Bool("stream", false, "live response") // for streaming live response
 	method := flag.String("x", "GET", "http method")
-	allowedBody := flag.Bool("b", true, "allow request body logging.")
+	allowedBody := flag.Bool("b", false, "allow request body logging.")
 	bodySize := flag.Int("s", 0, "body size")
 
 	data := flag.String("d", "", "request data")
