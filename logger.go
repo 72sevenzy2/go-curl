@@ -53,5 +53,7 @@ func Log(v *http.Client, req *http.Request, bodyAllowed *bool, bodySize *int) (t
 
 	}
 
-	return end, resp, bodyprev, max, nil
+	final := len(bodybytes)
+
+	return end, resp, bodyprev, &final, nil
 }
