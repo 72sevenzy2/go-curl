@@ -33,7 +33,7 @@ func Normalize(keyname any) (string, error) {
 
 // utility get/set functions for data map:
 
-// for strings
+// for both strings and ints
 func (d *Data) Get(keyname any) (string, bool, error) {
 	newKey, err := Normalize(keyname)
 	if err != nil {
@@ -56,4 +56,15 @@ func (d *Data) Set(keyname any, value string) (error, bool) {
 	}
 	d.data_storage[newK] = value
 	return nil, true
+}
+
+// del func
+func (d *Data) Del(keyname any) (error, bool) {
+	newk, err := Normalize(keyname)
+	if err == nil {
+		delete(d.data_storage, newk)
+		return nil, true
+	} else {
+		return errors.New("key does not exist."), false
+	}
 }
