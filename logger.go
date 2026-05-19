@@ -8,18 +8,20 @@ import (
 	"time"
 )
 
-func Log(v *http.Client, req *http.Request, bodyAllowed *bool, bodySize uint16) (time.Duration, *http.Response, error) {
+func intPtr(i int) *int { return &i } // returns *int
+
+func Log(v *http.Client, req *http.Request, bodyAllowed *bool, bodySize *int) (time.Duration, *http.Response, string, *int, error) {
 	start := time.Now()
 	resp, err := v.Do(req)
 	if err != nil {
-		return 0, nil, err
+		return 0, nil, "", intPtr(0), err
 	}
 	end := time.Since(start)
 
 	// fmt.Println("visited to:", req.URL.Path)
 	// fmt.Println("method:", req.Method)
 	fmt.Printf("visited to %s, with method %s", req.URL.Path, req.Method)
-	fmt.Println("full url:", req.URL)
+	fmt.Println(" full url:", req.URL)
 	// request query
 	if req.URL.RawQuery != "" {
 		fmt.Println("with query:", req.URL.RawQuery)
@@ -32,27 +34,24 @@ func Log(v *http.Client, req *http.Request, bodyAllowed *bool, bodySize uint16) 
 	fmt.Println(newHeaders) // then display
 
 	// request body printing
+	var bodyprev string // body preview (string) var
+	var max *int // body size var
+	var bodybytes []byte // body size (in bytes)
 
 	if *bodyAllowed {
-		max := bodySize // 1 kb default (will add customisable max sizes later on)
-		bodybytes, err := io.ReadAll(resp.Body)
+		max = bodySize
+		bodybytes, err = io.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-		if len(bodybytes) == 0 {
-			fmt.Println("response does not contain any body.")
-		}
 
 		resp.Body = io.NopCloser(bytes.NewBuffer(bodybytes))
-		if len(bodybytes) > int(max) {
-			bodybytes = bodybytes[:max]
-		} else {
-			bodyprev := string(bodybytes)
-			fmt.Println("request body:", bodyprev)
+		if *max > 0 && len(bodybytes) > *max {
+			bodybytes = bodybytes[:*max]
 		}
+		bodyprev = string(bodybytes)
 
-		fmt.Println("logged request body with size:", bodySize)
 	}
 
-	return end, resp, nil
+	return end, resp, bodyprev, max, nil
 }
