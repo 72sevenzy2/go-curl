@@ -46,9 +46,12 @@ func Log(v *http.Client, req *http.Request, bodyAllowed *bool, bodySize *int) (t
 		}
 
 		resp.Body = io.NopCloser(bytes.NewBuffer(bodybytes))
+
+		fmt.Println("max:", *max, "len:", len(bodybytes))
 		if *max > 0 && len(bodybytes) > *max {
 			bodybytes = bodybytes[:*max]
 		}
+		fmt.Println("after truncating:", len(bodybytes))
 		bodyprev = string(bodybytes)
 
 	}
