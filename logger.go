@@ -38,7 +38,7 @@ func Log(v *http.Client, req *http.Request, bodyAllowed *bool, bodySize uint16) 
 
 	if *bodyAllowed {
 		max := bodySize // 1 kb default (will add customisable max sizes later on)
-		bodybytes, err := io.ReadAll(req.Body)
+		bodybytes, err := io.ReadAll(resp.Body)
 		if err != nil {
 			if len(bodybytes) == 0 {
 				fmt.Println("request does not contain any body.")
@@ -47,13 +47,15 @@ func Log(v *http.Client, req *http.Request, bodyAllowed *bool, bodySize uint16) 
 			}
 		}
 
-		req.Body = io.NopCloser(bytes.NewBuffer(bodybytes))
+		resp.Body = io.NopCloser(bytes.NewBuffer(bodybytes))
 		if len(bodybytes) > int(max) {
 			bodybytes = bodybytes[:max]
 		} else {
 			bodyprev := string(bodybytes)
 			fmt.Println("request body:", bodyprev)
 		}
+
+		fmt.Println("logged request body with size:", bodySize)
 	}
 
 	return end, resp, nil
