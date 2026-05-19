@@ -1,9 +1,6 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -12,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"bufio"
 	"time"
 )
 
@@ -21,10 +19,13 @@ type HeaderFlags []string
 func main() {
 	var headers HeaderFlags
 
+	// cli inputs
 	flag.Var(&headers, "H", "Header (key:value)")
 	stream := flag.Bool("stream", false, "live response") // for streaming live response
 	method := flag.String("x", "GET", "http method")
-	session := flag.Bool("session", false, "live interactive mode to store and receive variable-like data.")
+	allowedBody := flag.Bool("b", false, "allow request body logging.")
+	bodySize := flag.Int("s", 0, "body size")
+	session := flag.Bool("session", false, "enable session mode.")
 
 	data := flag.String("d", "", "request data")
 
@@ -48,7 +49,7 @@ func main() {
 
 	// validating whether method given is appropriate (only support for post and get for now)
 	uc := strings.ToUpper(*method) // normalise request method input as all caps for easier comparison
-	var v string // holding actual method after validating if method is appropriate
+	var v string                   // holding actual method after validating if method is appropriate
 
 	// simplified
 	allowed := map[string]bool{
@@ -62,7 +63,7 @@ func main() {
 		fmt.Println("method not allowed")
 		return
 	}
-	
+
 	// body reader for post data
 	var body io.Reader
 
@@ -98,8 +99,15 @@ func main() {
 	// 	return
 	// }
 
-	// track latency
-	end, resp, err := Log(client, req)
+	// debugging
+	fmt.Println("bodyAllowed:", *allowedBody) 
+
+	// logging
+	end, resp, bodyprev, bodysize, err := Log(client, req, allowedBody, bodySize)
+
+	if bodyprev == "" {
+		fmt.Println("body is empty")
+	}
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -109,18 +117,13 @@ func main() {
 	defer resp.Body.Close() // important as not closing resp.Body would lead to performance issues + leaks, aswell as its apart of the ReadCloser interface so it has be closed.
 
 	if *stream {
+		fmt.Println("streaming live data:")
 		_, err := io.Copy(os.Stdout, resp.Body)
 		if err != nil {
 			log.Fatal(err.Error())
 			return
 		}
 	} else {
-		body, err := io.ReadAll(resp.Body)
-
-		if err != nil {
-			log.Fatal(err.Error())
-			return
-		}
 
 		// checking if request failed if yes then log
 		if resp.StatusCode >= 400 { // anything over 400 means request wasnt successful
@@ -137,18 +140,12 @@ func main() {
 			fmt.Println(k+":", v) // key:value output style for headers
 		}
 
-		fmt.Println("\nresponse size:")
-		fmt.Println(len(body), "bytes")
-
 		fmt.Println("\nbody:")
 
-		var format bytes.Buffer // pretty printed body will be stored here before outputted
+		// var format bytes.Buffer // pretty printed body will be stored here before outputted
 
-		err = json.Indent(&format, body, "", "  ")
-		if err == nil {
-			fmt.Println(format.String())
-		} else {
-			fmt.Println(string(body), err.Error())
-		}
+		fmt.Println(bodyprev)
+
+		fmt.Println("logged request body with size", *bodysize)
 	}
 }
