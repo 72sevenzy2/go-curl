@@ -20,10 +20,12 @@ type HeaderFlags []string
 func main() {
 	var headers HeaderFlags
 
+	// cli inputs
 	flag.Var(&headers, "H", "Header (key:value)")
 	stream := flag.Bool("stream", false, "live response") // for streaming live response
 	method := flag.String("x", "GET", "http method")
 	allowedBody := flag.Bool("b", false, "allow request body logging.")
+	bodySize := flag.Int("-s", 0, "body size")
 
 	data := flag.String("d", "", "request data")
 
@@ -89,7 +91,7 @@ func main() {
 	// }
 
 	// track latency
-	end, resp, err := Log(client, req, allowedBody)
+	end, resp, err := Log(client, req, allowedBody, uint16(*bodySize))
 
 	if err != nil {
 		log.Fatal(err.Error())
