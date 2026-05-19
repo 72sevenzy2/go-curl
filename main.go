@@ -134,6 +134,6 @@ func main() {
 
 		fmt.Println(bodyprev)
 
-		fmt.Println("logged request body with size", bodysize)
+		fmt.Println("logged request body with size", *bodysize)
 	}
 }
