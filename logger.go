@@ -25,9 +25,6 @@ func Log(v *http.Client, req *http.Request, bodyAllowed *bool, bodySize uint16) 
 		fmt.Println("with query:", req.URL.RawQuery)
 	}
 
-	fmt.Println("user details:")
-	fmt.Println("client:", req.RemoteAddr)
-
 	// exlude sensitive headers
 	fmt.Println("request header details:")
 	newHeaders := req.Header.Clone()
@@ -40,11 +37,10 @@ func Log(v *http.Client, req *http.Request, bodyAllowed *bool, bodySize uint16) 
 		max := bodySize // 1 kb default (will add customisable max sizes later on)
 		bodybytes, err := io.ReadAll(resp.Body)
 		if err != nil {
-			if len(bodybytes) == 0 {
-				fmt.Println("request does not contain any body.")
-			} else {
-				fmt.Println(err.Error())
-			}
+			fmt.Println(err.Error())
+		}
+		if len(bodybytes) == 0 {
+			fmt.Println("response does not contain any body.")
 		}
 
 		resp.Body = io.NopCloser(bytes.NewBuffer(bodybytes))
