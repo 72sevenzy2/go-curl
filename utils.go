@@ -17,7 +17,7 @@ func (h *HeaderFlags) Set(value string) error {
 }
 
 func Validate(args []string) error {
-	if len(args) < 2 {
+	if len(args) < 1 {
 		UsageMsg := errors.New("usage > main.go <URL> [-H key:value]")
 		return fmt.Errorf("%s", UsageMsg.Error())
 	}
