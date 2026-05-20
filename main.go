@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"flag"
 	"fmt"
@@ -9,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"bufio"
 	"time"
 )
 
@@ -26,7 +26,7 @@ func main() {
 	allowedBody := flag.Bool("b", false, "allow request body logging.")
 	bodySize := flag.Int("s", 0, "body size")
 	session := flag.Bool("session", false, "enable session mode.")
-	
+
 	data := flag.String("d", "", "request data")
 
 	flag.Parse()
@@ -46,7 +46,6 @@ func main() {
 
 	url := flag.Args()[0]
 
-	// validating whether method given is appropriate (only support for post and get for now)
 	uc := strings.ToUpper(*method) // normalise request method input as all caps for easier comparison
 	var v string                   // holding actual method after validating if method is appropriate
 
@@ -99,7 +98,7 @@ func main() {
 	// }
 
 	// debugging
-	fmt.Println("bodyAllowed:", *allowedBody) 
+	fmt.Println("bodyAllowed:", *allowedBody)
 
 	// logging
 	end, resp, bodyprev, bodysize, err := Log(client, req, allowedBody, bodySize)
