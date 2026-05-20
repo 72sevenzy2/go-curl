@@ -29,7 +29,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				fmt.Println(err.Error())
 				continue
 			}
-			fmt.Println("successful")
+			fmt.Println("successful.")
 			continue
 		case "GET":
 			val, ok, err := store.Get(parts[1])
@@ -38,10 +38,17 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				continue
 			}
 			fmt.Println(val)
+
+		case "DEL":
+			fmt.Println("deleted key.")
+			err, ok := store.Del(parts[1])
+			if !ok && err != nil {
+				fmt.Println(err.Error())
+				continue
+			}
 		case "EXIT":
 			fmt.Println("exiting will remove saved variables.")
 			return
 		}
-
 	}
 }
