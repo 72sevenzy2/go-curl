@@ -51,36 +51,44 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 		// actual api testing logic (GET only for now)
 		case "TEST":
-			if parts[1] == "" { // parts[1] will be the url the user wanted to test
-				fmt.Println("please include a valid url aswell.")
+			if len(parts) != 2 { // validate arguments before continuing or it will panic
+				fmt.Println("variable as second argument does not exit, consider setting a var.")
 				continue
 			} else {
-				client := http.Client{}
-				cl, err := http.NewRequest(http.MethodGet, parts[1], nil) // new request
+				val, ok, err := store.Get(parts[1]) // check if parts[1] exists as a var first
 				if err != nil {
 					fmt.Println(err.Error())
 					continue
 				}
- 
-				resp, err2 := client.Do(cl) // send the request to the url provided
-				if err2 == nil {
-					// shadow auth header from resp
-					clonedH := resp.Header.Clone()
-					clonedH.Del("authorization")
 
-					respB := resp.Body
-					defer respB.Close() // close the connection at the end of this block
-
-					// outputting
-					fmt.Println("response headers:")
-					fmt.Println(clonedH)
-					for range 10 {
-						fmt.Println("-") // seperator for headers and resp body so its easier to read
+				if ok {
+					client := http.Client{}
+					cl, err := http.NewRequest(http.MethodGet, val, nil) // new request
+					if err != nil {
+						fmt.Println(err.Error())
+						continue
 					}
-					fmt.Println("response body:")
-					fmt.Println(respB)
+					resp, err2 := client.Do(cl) // send the request to the url provided
+					if err2 == nil {
+						// shadow auth header from resp
+						clonedH := resp.Header.Clone()
+						clonedH.Del("authorization")
+
+						respB := resp.Body
+						defer respB.Close() // close the connection at the end of this block
+
+						// outputting
+						fmt.Println("response headers:")
+						fmt.Println(clonedH)
+						for range 10 {
+							fmt.Print("-") // seperator for headers and resp body so its easier to read
+						}
+						fmt.Println("response body:")
+						fmt.Println(respB)
+					}
 				}
 			}
+
 		// for exiting
 		case "EXIT":
 			fmt.Println("exiting will remove saved variables.")
