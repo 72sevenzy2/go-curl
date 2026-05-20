@@ -86,6 +86,9 @@ func StartSession(b *bufio.Scanner, store *Data) {
 						fmt.Println("response body:")
 						fmt.Println(respB)
 					}
+				} else { // if key does not exit
+					fmt.Println("variable does not exit, consider setting one.")
+					continue
 				}
 			}
 
