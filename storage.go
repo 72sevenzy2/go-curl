@@ -4,7 +4,6 @@ package main
 
 import (
 	"errors"
-	"strconv"
 )
 
 type Data struct {
@@ -15,19 +14,6 @@ type Data struct {
 func NewStore() *Data {
 	return &Data{
 		make(map[string]string),
-	}
-}
-
-// normalize key types to string
-func Normalize(keyname any) (string, error) {
-	switch v := keyname.(type) {
-	case int:
-		return strconv.Itoa(v), nil
-	case string:
-		return v, nil
-	default:
-		errms := errors.New("invalid type: consider only string or int.")
-		return "", errms
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"strconv"
 )
 
 func (h *HeaderFlags) String() string { // gets called internally by go's flag pkg, (type flag.Value expects a String() and Set() func)
@@ -36,4 +37,17 @@ func AddHeaders(req *http.Request, args HeaderFlags) error {
 		req.Header.Set(strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]))
 	}
 	return nil
+}
+
+// normalize key types to string (for storage.go)
+func Normalize(keyname any) (string, error) {
+	switch v := keyname.(type) {
+	case int:
+		return strconv.Itoa(v), nil
+	case string:
+		return v, nil
+	default:
+		errms := errors.New("invalid type: consider only string or int.")
+		return "", errms
+	}
 }
