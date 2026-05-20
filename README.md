@@ -6,7 +6,7 @@
 
 <h3 align="center">go --v</h3>
 
-<h3 align="center">(this project only suppots post/get requests for API-testing for now, but will extend later on.)</h3>
+<h3 align="center">(only supports post/get requests for API-testing for now, but will extend later on.)</h3>
 
 <h2 align="center">get started:</h2>
 
