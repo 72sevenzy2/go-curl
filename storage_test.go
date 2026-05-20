@@ -14,10 +14,16 @@ func TestStorage(t *testing.T) {
 		fmt.Println("could not save data")
 	}
 
+	_, k := store.Del(1)
+	if !k {
+		fmt.Println("key does no exist.")
+	}
+
+
 	val, exists, _ := store.Get(1)
 	if exists {
 		fmt.Println("data exists:", val)
 	} else {
-		fmt.Println("couldnt retrieve data")
+		fmt.Println("couldnt retrieve data") // expected output for del testing
 	}
 }
