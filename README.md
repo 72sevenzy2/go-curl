@@ -55,7 +55,7 @@
 <h3 align="center">Instead of manually pasting, you can enter session mode to dynamically store urls, headers, etc in a variable and then use that variable to test API's (in which the variable will hold the header/url etc).</h3>
 
 <br>
-<h2 align="center">to enter session mode, run the following:</h2>
+<h3 align="center">to enter session mode, run the following:</h3>
 
 <h3 align="center">
     <code> go run . [-session true/false] </code>
