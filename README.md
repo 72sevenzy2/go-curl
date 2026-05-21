@@ -55,7 +55,6 @@
 <h3 align="center">Instead of manually pasting, you can enter session mode to dynamically store urls, headers, etc in a variable and then use that variable to test API's (in which the variable will hold the header/url etc).</h3>
 
 <br>
-
 <h2 align="center">to enter session mode, run the following:</h2>
 
 <h3 align="center">
@@ -63,3 +62,24 @@
 </h3>
 
 <h3 align="center">when entering session mode, the url does not need to be present at the end.</h3>
+<br>
+<h2 align="center">session mode tutorial:</h2>
+<h3 align="center">start off by setting a variable to hold a url/header or such.</h3>
+<h3 align="center">
+    <code> VAR [VarName] [Value]</code>
+</h3>
+<h3 align="center">and to retrieve a variable:</h3>
+<h3 align="center">
+    <code> GET [VarName] </code>
+</h3>
+<h3 align="center">and it returns the value of whatever the variable stores.</h3>
+<h3 align="center">to delete a variable, run:</h3>
+<h3 align="center">
+    <code> DEL [VarName] </code>
+</h3>
+<br>
+<h3 align="center">using the variables you stored for API testing:</h3>
+<h3 align="center">
+    <code> TEST [VarName] </code>
+</h3>
+<h4 align="center">however, VarName needs to be a valid url for it to work. As of now TEST cmd only supports urls as arguments and tests it using an GET request, (will be extending later on for more compatability such as setting headers, post requests and such).</h4>
