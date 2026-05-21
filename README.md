@@ -11,7 +11,7 @@
 </h2>
 
 <br>
-<h3 align="center">(only supports post/get requests for now, but will extend later on).</h3>
+<h3 align="center">(project only supports post/get requests for now, but will extend later on).</h3>
 <br>
 <h1 align="center">get started:</h2>
 
