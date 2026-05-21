@@ -43,10 +43,10 @@
 <h2 align="center">include response body logging:</h2>
 
 <h3 align="center">
-    <code> go run . [-b true/false -s 1204] [URL] </code>
+    <code> go run . [-b true/false -s 1024] [URL] </code>
 </h3>
 
-<h4 align="center">(important to note you can set a limit on the response body size to log (positive integers only), as with the -s flag, if you want it to be the default (1024), simply do not include the flag).</h4>
+<h4 align="center">(important to note you can set a limit on the response body size to log (positive values only), as with the -s flag, if you want it to be the default (1024), simply do not include the flag).</h4>
 
 <br>
 
