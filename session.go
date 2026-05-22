@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -79,12 +80,29 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 						// outputting
 						fmt.Println("response headers:")
-						fmt.Println(clonedH)
+						// fmt.Println(clonedH)
+						for header, val := range clonedH {
+							fmt.Println("header:", header)
+							for _, v := range val {
+								fmt.Println("value:", v)
+								for range 5 {
+									fmt.Print("-")
+								}
+							}
+						}
 						for range 10 {
 							fmt.Print("-") // seperator for headers and resp body so its easier to read
 						}
-						fmt.Println("response body:")
-						fmt.Println(respB)
+						body, err := io.ReadAll(respB) // read respB bytes
+						if err != nil {
+							continue // skip current iteration if no body
+						} else {
+							fmt.Println("\nresponse body:")
+							for range 10 {
+								fmt.Print("-")
+							}
+							fmt.Println("\n", string(body))
+						}
 					}
 				} else { // if key does not exit
 					fmt.Println("variable does not exit, consider setting one.")
