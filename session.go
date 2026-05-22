@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 )
-
+	
 // start a interactive session
 func StartSession(b *bufio.Scanner, store *Data) {
 	fmt.Println("session started.")
@@ -52,7 +52,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 		// actual api testing logic (GET only for now)
 		case "TEST":
-			if len(parts) != 2 { // validate arguments before continuing or it will panic
+			if len(parts) < 2 { // validate arguments before continuing (other it will panic)
 				fmt.Println("variable as second argument does not exit, consider setting a var.")
 				continue
 			} else {
@@ -62,6 +62,9 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					continue
 				}
 
+				// flag value to confirm if header values are validated
+				pass := true
+
 				if ok {
 					client := http.Client{}
 					cl, err := http.NewRequest(http.MethodGet, val, nil) // new request
@@ -69,6 +72,41 @@ func StartSession(b *bufio.Scanner, store *Data) {
 						fmt.Println(err.Error())
 						continue
 					}
+
+					// parse header arguments
+					for i := range len(parts) {
+						upc := strings.ToUpper(parts[i]) // normalize "-h" to all uppercase
+
+						if upc == "-H" {
+							// check if header values exist
+							if i+1 >= len(parts) {
+								fmt.Println("missing header values.")
+								continue
+							}
+
+							headers := strings.SplitN(parts[i+1], ":", 2) // splits headers as:
+							// for example: header1:value, splitN() would split it so:
+							// map[string]string{
+							// 	"header1",
+							//  "value",
+							// }
+
+							if len(headers) < 2 { // validate length of headers or it will panic during execution
+								fmt.Println("please include both header name and value.")
+								pass = false
+								break
+							}
+							if headers[0] != "" && headers[1] != "" {
+								cl.Header.Add(headers[0], headers[1])
+							} else {
+								continue
+							}
+						} else {
+							continue
+						}
+					}
+
+					if !pass { continue }
 					resp, err2 := client.Do(cl) // send the request to the url provided
 					if err2 == nil {
 						// shadow auth header from resp
@@ -104,6 +142,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 							fmt.Println("\n", string(body))
 						}
 					}
+
 				} else { // if key does not exit
 					fmt.Println("variable does not exit, consider setting one.")
 					continue
