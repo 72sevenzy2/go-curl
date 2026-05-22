@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 )
-	
+
 // start a interactive session
 func StartSession(b *bufio.Scanner, store *Data) {
 	fmt.Println("session started.")
@@ -62,12 +62,17 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					continue
 				}
 
-				// flag value to confirm if header values are validated
-				pass := true
+				// flag value pass, and reqType to hold the type of method.
+				var (
+					pass    bool
+					reqType string
+					// bodyData map[string]string
+				)
+				pass = true
 
 				if ok {
 					client := http.Client{}
-					cl, err := http.NewRequest(http.MethodGet, val, nil) // new request
+					cl, err := http.NewRequest(reqType, val, nil) // new request
 					if err != nil {
 						fmt.Println(err.Error())
 						continue
@@ -101,12 +106,56 @@ func StartSession(b *bufio.Scanner, store *Data) {
 							} else {
 								continue
 							}
-						} else {
-							continue
 						}
+
+						// to check if argument is for req methods
+						if upc == "-X" {
+
+							// validate if values exist (GET or POST)
+							if i+1 >= len(parts) {
+								fmt.Println("missing argument values, consider either POST or GET.")
+								continue
+							}
+
+							if parts[i+1] == "POST" {
+								reqType = http.MethodPost
+
+								// validate if request body flag also exists aswell as its data
+								if i+2 >= len(parts) {
+									fmt.Println("missing request body flag, consider: -d [data]")
+									continue
+								}
+
+								uppercased1 := strings.ToUpper(parts[i+2]) // normalize parts[i+2]
+
+								if uppercased1 == "-D" {
+									
+									// validate if values exist
+									if i+3 >= len(parts) {
+										fmt.Println("please include actual data.")
+										continue
+									}
+
+									
+
+								}
+
+
+							} else {
+								if parts[i+1] == "GET" {
+									reqType = http.MethodGet
+								} else {
+									fmt.Println("invalid method type.")
+									continue
+								}
+							}
+						}
+
 					}
 
-					if !pass { continue }
+					if !pass {
+						continue
+					}
 					resp, err2 := client.Do(cl) // send the request to the url provided
 					if err2 == nil {
 						// shadow auth header from resp
