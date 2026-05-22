@@ -2,36 +2,30 @@
 
 
 <h2 align="center">
-    <code>
-    go -v
-    </code>
+    <code> go -v </code>
 </h2>
 <h2 align="center">or:</h2>
 
 <h2 align="center">
-    <code>
-    go --v
-    </code>
+    <code> go --v </code>
 </h2>
 
 <br>
-<h3 align="center">(only supports post/get requests for now, but will extend later on).</h3>
+<h3 align="center">(project only supports post/get requests for now, but will extend later on).</h3>
 <br>
 <h1 align="center">get started:</h2>
 
 <h2 align="center">setting headers while testing:</h2>
 
 <h3 align="center"> 
-    <code>go run . [-H key:value] [URL]</code>
+    <code> go run . [-H key:value] [URL] </code>
 </h>
 
 
 <br>
 <h2 align="center">testing post/get requests:</h2>
 <h3 align="center">
-    <code>
-    go run . [-x POST/GET] [URL]
-    </code>
+    <code> go run . [-x POST/GET] [URL] </code>
 </h3>
 
 <br>
@@ -39,9 +33,7 @@
 <h2 align="center">with streaming enabled: (streaming gives live response data back.)</h2>
 
 <h3 align="center">
-    <code>
-    go run . [-H key:value] [-stream true/false] [URL];
-    </code>
+    <code> go run . [-H key:value] [-stream true/false] [URL] </code>
 </h3>
 
 <h3 align="center">(important to note that you can include 1 of many flags while testing aswell, but make sure to always include the URL at the end).</h3>
@@ -51,12 +43,10 @@
 <h2 align="center">include response body logging:</h2>
 
 <h3 align="center">
-    <code>
-        go run . [-b true/false -s 1204] [URL]
-    </code>
+    <code> go run . [-b true/false -s 1024] [URL] </code>
 </h3>
 
-<h4 align="center">(important to note you can set a limit on the response body size to log (positive integers only), as with the -s flag, if you want it to be the default (1024), simply do not include the flag).</h4>
+<h4 align="center">(important to note you can set a limit on the response body size to log (positive values only), as with the -s flag, if you want it to be the default (1024), simply do not include the flag).</h4>
 
 <br>
 
@@ -65,13 +55,31 @@
 <h3 align="center">Instead of manually pasting, you can enter session mode to dynamically store urls, headers, etc in a variable and then use that variable to test API's (in which the variable will hold the header/url etc).</h3>
 
 <br>
-
-<h2 align="center">to enter session mode, run the following:</h2>
+<h3 align="center">to enter session mode, run the following:</h3>
 
 <h3 align="center">
-    <code>
-        go run . [-session true/false]
-    </code>
+    <code> go run . [-session true/false] </code>
 </h3>
 
 <h3 align="center">when entering session mode, the url does not need to be present at the end.</h3>
+<br>
+<h2 align="center">session mode tutorial:</h2>
+<h3 align="center">start off by setting a variable to hold a url/header or such.</h3>
+<h3 align="center">
+    <code> VAR [VarName] [Value]</code>
+</h3>
+<h3 align="center">and to retrieve a variable:</h3>
+<h3 align="center">
+    <code> GET [VarName] </code>
+</h3>
+<h3 align="center">and it returns the value of whatever the variable stores.</h3>
+<h3 align="center">to delete a variable, run:</h3>
+<h3 align="center">
+    <code> DEL [VarName] </code>
+</h3>
+<br>
+<h3 align="center">using the variables you stored for API testing:</h3>
+<h3 align="center">
+    <code> TEST [VarName] </code>
+</h3>
+<h4 align="center">however, VarName needs to be a valid url for it to work. As of now TEST cmd only supports urls as arguments and tests it using an GET request, (will be extending later on for more compatability such as setting headers, post requests and such).</h4>
