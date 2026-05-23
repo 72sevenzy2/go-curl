@@ -266,8 +266,6 @@ func StartSession(b *bufio.Scanner, store *Data) {
 						if !isJsonH && !isFormH {
 							cl.Header.Add(reqHeaders[0], reqHeaders[1])
 						}
-					} else {
-						continue // if not 2 elements then skip
 					}
 
 					resp, err2 := client.Do(cl) // send the request to the url provided
