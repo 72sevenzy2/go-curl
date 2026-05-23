@@ -25,7 +25,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 	fmt.Println("session started.")
 	for {
 		fmt.Print(">")
-		isOk := b.Scan() // take input 
+		isOk := b.Scan() // take input
 		if !isOk {
 			fmt.Println(b.Err()) // possible scanner error case
 		}
@@ -79,17 +79,16 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 				//  utility variables
 				var (
-					pass    bool
-					reqType string
+					pass     bool
+					reqType  string
 					bodyData map[string]string
 					jsonData string
 				)
 				pass = true
 
-
 				// request initialisation variables
 				var (
-					cl *http.Request
+					cl    *http.Request
 					clErr error
 				)
 
@@ -99,7 +98,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					if jsonData != "" && reqType == http.MethodPost {
 						cl, clErr = http.NewRequest(reqType, val, bytes.NewBuffer([]byte(jsonData)))
 					}
-					
+
 					if clErr != nil {
 						fmt.Println(err)
 						continue
@@ -123,7 +122,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 							//  "value",
 							// }
 
-							if len(headers) < 2 { // validate length of headers or it will panic during execution
+							if len(headers) < 2 || len(headers) > 2 { // validate length of headers or it will panic during execution
 								fmt.Println("please include both header name and value.")
 								pass = false
 								break
@@ -155,8 +154,8 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 								uppercased1 := strings.ToUpper(parts[i+2]) // normalize parts[i+2]
 
-								if uppercased1 == "-D" {
-									
+								if uppercased1 == "-D" { // for normal json data
+
 									// validate if values exist
 									if i+3 >= len(parts) {
 										fmt.Println("please include actual data in json format.")
@@ -176,6 +175,24 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 								}
 
+								if uppercased1 == "-F" { // form mode
+									if i+3 >= len(parts) {
+										fmt.Println("please include the necessary form data with format: 'title:value'")
+										continue
+									}
+
+									formParts := strings.SplitN(parts[i+3], ":", 2)
+
+									if len(formParts) < 2 || len(formParts) > 2 {
+										fmt.Println("please use the correct format.")
+										continue
+									}
+
+									bodyData = map[string]string{ // appending necessary deaails to body
+										"title": formParts[0],
+										"value": formParts[1],
+									}
+								}
 
 							} else {
 								if parts[i+1] == "GET" {
