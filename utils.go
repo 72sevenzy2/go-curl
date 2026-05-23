@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"errors"
+	"encoding/json"
 	"net/http"
 	"strings"
 	"strconv"
@@ -49,5 +50,15 @@ func Normalize(keyname any) (string, error) {
 	default:
 		errms := errors.New("invalid type: consider only string or int.")
 		return "", errms
+	}
+}
+
+// small utils to convert to json (for session.go)
+func ToJson(v any) (string, error) {
+	jsons, err := json.Marshal(v)
+	if err == nil {
+		return string(jsons), nil
+	} else {
+		return "", fmt.Errorf("error: %s", err.Error()) // print error
 	}
 }
