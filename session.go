@@ -181,7 +181,11 @@ func StartSession(b *bufio.Scanner, store *Data) {
 										continue
 									}
 
-									formParts := strings.SplitN(parts[i+3], ":", 2)
+									formParts := strings.SplitN(parts[i+3], ":", 2) // needs to be in a format like so:
+									// "title:value", and strings.SplitN(...) would return:
+									// map[string]string{
+									//		"title": "value",
+									// }
 
 									if len(formParts) < 2 || len(formParts) > 2 {
 										fmt.Println("please use the correct format.")
