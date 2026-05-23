@@ -58,11 +58,12 @@ func StartSession(b *bufio.Scanner, store *Data) {
 			fmt.Println(val)
 
 		case "DEL":
-			fmt.Println("deleted key.")
 			err, ok := store.Del(parts[1])
 			if !ok && err != nil {
 				fmt.Println(err.Error())
 				continue
+			} else {
+				fmt.Println("deleted key.")
 			}
 
 		// actual api testing logic (GET only for now)
@@ -187,6 +188,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									//		"title": "value",
 									// }
 
+									// validate if formParts is of correct length now (or will panic)
 									if len(formParts) < 2 || len(formParts) > 2 {
 										fmt.Println("please use the correct format.")
 										continue
