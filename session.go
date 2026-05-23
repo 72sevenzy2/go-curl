@@ -3,23 +3,12 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
 )
-
-// small utils to convert to json
-func toJson(v any) (string, error) {
-	jsons, err := json.Marshal(v)
-	if err == nil {
-		return string(jsons), nil
-	} else {
-		return "", fmt.Errorf("error: %s", err.Error()) // print error
-	}
-}
 
 // start a interactive session
 func StartSession(b *bufio.Scanner, store *Data) {
@@ -169,7 +158,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 										"data": parts[i+3],
 									}
 
-									data, err := toJson(bodyData)
+									data, err := ToJson(bodyData)
 									if err != nil {
 										fmt.Println(err.Error())
 										continue
