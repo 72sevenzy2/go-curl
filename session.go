@@ -91,19 +91,12 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				var (
 					cl    *http.Request
 					clErr error
+
+					// for appending headers
+					reqHeaders []string // reqHeaders being globally accessed by this scope, so headers can be assigned after initialising request.
 				)
 
 				if ok {
-					client := http.Client{}
-					// cl, err := http.NewRequest(reqType, val, nil) // new request
-					if jsonData != "" && reqType == http.MethodPost {
-						cl, clErr = http.NewRequest(reqType, val, bytes.NewBuffer([]byte(jsonData)))
-					}
-
-					if clErr != nil {
-						fmt.Println(err)
-						continue
-					}
 
 					// parse header arguments
 					for i := range len(parts) {
@@ -116,23 +109,26 @@ func StartSession(b *bufio.Scanner, store *Data) {
 								continue
 							}
 
-							headers := strings.SplitN(parts[i+1], ":", 2) // splits headers as:
+							reqHeaders = strings.SplitN(parts[i+1], ":", 2) // splits headers as:
 							// for example: header1:value, splitN() would split it so:
 							// map[string]string{
 							// 	"header1",
 							//  "value",
 							// }
 
-							if len(headers) < 2 || len(headers) > 2 { // validate length of headers or it will panic during execution
+							if len(reqHeaders) < 2 || len(reqHeaders) > 2 { // validate length of headers or it will panic during execution
 								fmt.Println("please include both header name and value.")
 								pass = false
 								break
-							}
-							if headers[0] != "" && headers[1] != "" {
-								cl.Header.Add(headers[0], headers[1])
 							} else {
-								continue
+								continue // skip
 							}
+
+							// refactored above ^ (keeping this block for future reference)
+							// if reqHeaders[0] == "" && reqHeaders[1] == "" {
+							// 	// cl.Header.Add(headers[0], headers[1])
+							// 	continue
+							// }
 						}
 
 						// to check if argument is for req methods
@@ -198,6 +194,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 										"title": formParts[0],
 										"value": formParts[1],
 									}
+
 								}
 
 							} else {
@@ -210,6 +207,30 @@ func StartSession(b *bufio.Scanner, store *Data) {
 							}
 						}
 
+					}
+
+					// small flag value to ensure headers dont overwrite eachother
+					isJsonH := false
+
+					client := http.Client{}
+					// cl, err := http.NewRequest(reqType, val, nil) // new request
+					if jsonData != "" && reqType == http.MethodPost {
+						cl, clErr = http.NewRequest(reqType, val, bytes.NewBuffer([]byte(jsonData)))
+
+						// set content type to json after creating request
+						cl.Header.Add("Content-Type", "application/json")
+						isJsonH = true
+					}
+
+					// attaching headers (only if json body data is not included)
+					if !isJsonH {
+						cl.Header.Add(reqHeaders[0], reqHeaders[1])
+					}
+
+
+					if clErr != nil {
+						fmt.Println(err)
+						continue
 					}
 
 					if !pass {
