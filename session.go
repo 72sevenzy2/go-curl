@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -87,13 +88,15 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				)
 				pass = true
 
-				// request initialisation variables
+				// request dependent variables
 				var (
 					cl    *http.Request
 					clErr error
 
 					// for appending headers
 					reqHeaders []string // reqHeaders being globally accessed by this scope, so headers can be assigned after initialising request.
+
+					formBody   io.Reader // to hold form data
 				)
 
 				if ok {
@@ -195,6 +198,13 @@ func StartSession(b *bufio.Scanner, store *Data) {
 										"value": formParts[1],
 									}
 
+									// appending the form values
+									data := url.Values{}
+
+									data.Set(formParts[0], formParts[1])
+									enc := data.Encode() // encode
+
+									formBody = bytes.NewBuffer([]byte(enc))
 								}
 
 							} else {
@@ -220,13 +230,18 @@ func StartSession(b *bufio.Scanner, store *Data) {
 						// set content type to json after creating request
 						cl.Header.Add("Content-Type", "application/json")
 						isJsonH = true
+					} else {
+						if jsonData == "" && reqType == http.MethodPost { // meaning that its form related request body data
+							cl, clErr = http.NewRequest(reqType, val, formBody)
+						} else {
+							continue // skip
+						}
 					}
 
 					// attaching headers (only if json body data is not included)
 					if !isJsonH {
 						cl.Header.Add(reqHeaders[0], reqHeaders[1])
 					}
-
 
 					if clErr != nil {
 						fmt.Println(err)
