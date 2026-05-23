@@ -99,6 +99,10 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					formBody io.Reader // to hold form data
 				)
 
+				// default request (GET) so cl does not stay nil if user were not to pass -X
+				cl, clErr = http.NewRequest(http.MethodGet, val, nil)
+				// clErr is handled below, after flags are parsed and appropriate requests are made.
+
 				if ok {
 
 					// parse header arguments
@@ -239,16 +243,13 @@ func StartSession(b *bufio.Scanner, store *Data) {
 							cl.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 							isFormH = true
 						} else {
-							continue // skip
+							fmt.Println("invalid method.")
+							continue
+						}
+						if reqType == http.MethodGet { // standard get method
+							cl, clErr = http.NewRequest(http.MethodGet, val, nil)
 						}
 
-					}
-
-					// attaching headers (only if json body data is not included)
-					if !isJsonH || !isFormH {
-						cl.Header.Add(reqHeaders[0], reqHeaders[1])
-					} else {
-						continue
 					}
 
 					if clErr != nil {
@@ -259,6 +260,16 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					if !pass {
 						continue
 					}
+
+					if len(reqHeaders) == 2 {
+						// attaching headers (only if json body data is not included)
+						if !isJsonH && !isFormH {
+							cl.Header.Add(reqHeaders[0], reqHeaders[1])
+						}
+					} else {
+						continue // if not 2 elements then skip
+					}
+
 					resp, err2 := client.Do(cl) // send the request to the url provided
 					if err2 == nil {
 						// shadow auth header from resp
@@ -266,8 +277,6 @@ func StartSession(b *bufio.Scanner, store *Data) {
 						clonedH.Del("authorization")
 
 						respB := resp.Body
-						defer respB.Close() // close the connection at the end of this block
-
 						// outputting
 						fmt.Println("response headers:")
 						// fmt.Println(clonedH)
@@ -293,6 +302,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 							}
 							fmt.Println("\n", string(body))
 						}
+						respB.Close() // close after reading response
 					}
 
 				} else { // if key does not exit
