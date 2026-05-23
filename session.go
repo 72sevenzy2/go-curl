@@ -253,7 +253,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					}
 
 					if clErr != nil {
-						fmt.Println(err)
+						fmt.Println(clErr)
 						continue
 					}
 
