@@ -208,7 +208,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									data.Set(formParts[0], formParts[1])
 									enc := data.Encode() // encode
 
-									formBody = bytes.NewBuffer([]byte(enc))
+									formBody = bytes.NewReader([]byte(enc))
 								}
 
 							} else {
@@ -230,7 +230,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					client := http.Client{}
 					// cl, err := http.NewRequest(reqType, val, nil) // new request
 					if jsonData != "" && reqType == http.MethodPost {
-						cl, clErr = http.NewRequest(reqType, val, bytes.NewBuffer([]byte(jsonData)))
+						cl, clErr = http.NewRequest(reqType, val, strings.NewReader(jsonData))
 
 						// set content type to json after creating request
 						cl.Header.Add("Content-Type", "application/json")
