@@ -2,18 +2,33 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 )
 
+// small utils to convert to json
+func toJson(v any) (string, error) {
+	jsons, err := json.Marshal(v)
+	if err == nil {
+		return string(jsons), nil
+	} else {
+		return "", fmt.Errorf("error: %s", err.Error()) // print error
+	}
+}
+
 // start a interactive session
 func StartSession(b *bufio.Scanner, store *Data) {
 	fmt.Println("session started.")
 	for {
 		fmt.Print(">")
-		b.Scan() // take input
+		isOk := b.Scan() // take input 
+		if !isOk {
+			fmt.Println(b.Err()) // possible scanner error case
+		}
 
 		input := b.Text()
 		parts := strings.Fields(input)
@@ -62,19 +77,31 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					continue
 				}
 
-				// flag value pass, and reqType to hold the type of method.
+				//  utility variables
 				var (
 					pass    bool
 					reqType string
-					// bodyData map[string]string
+					bodyData map[string]string
+					jsonData string
 				)
 				pass = true
 
+
+				// request initialisation variables
+				var (
+					cl *http.Request
+					clErr error
+				)
+
 				if ok {
 					client := http.Client{}
-					cl, err := http.NewRequest(reqType, val, nil) // new request
-					if err != nil {
-						fmt.Println(err.Error())
+					// cl, err := http.NewRequest(reqType, val, nil) // new request
+					if jsonData != "" && reqType == http.MethodPost {
+						cl, clErr = http.NewRequest(reqType, val, bytes.NewBuffer([]byte(jsonData)))
+					}
+					
+					if clErr != nil {
+						fmt.Println(err)
 						continue
 					}
 
@@ -132,11 +159,20 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									
 									// validate if values exist
 									if i+3 >= len(parts) {
-										fmt.Println("please include actual data.")
+										fmt.Println("please include actual data in json format.")
 										continue
 									}
+									bodyData = map[string]string{
+										"data": parts[i+3],
+									}
 
-									
+									data, err := toJson(bodyData)
+									if err != nil {
+										fmt.Println(err.Error())
+										continue
+									} else {
+										jsonData = data
+									}
 
 								}
 
