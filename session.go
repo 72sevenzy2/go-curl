@@ -96,7 +96,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					// for appending headers
 					reqHeaders []string // reqHeaders being globally accessed by this scope, so headers can be assigned after initialising request.
 
-					formBody   io.Reader // to hold form data
+					formBody io.Reader // to hold form data
 				)
 
 				if ok {
@@ -221,6 +221,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 					// small flag value to ensure headers dont overwrite eachother
 					isJsonH := false
+					isFormH := false
 
 					client := http.Client{}
 					// cl, err := http.NewRequest(reqType, val, nil) // new request
@@ -233,14 +234,21 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					} else {
 						if jsonData == "" && reqType == http.MethodPost { // meaning that its form related request body data
 							cl, clErr = http.NewRequest(reqType, val, formBody)
+
+							// setting appropriate header afterwards
+							cl.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+							isFormH = true
 						} else {
 							continue // skip
 						}
+
 					}
 
 					// attaching headers (only if json body data is not included)
-					if !isJsonH {
+					if !isJsonH || !isFormH {
 						cl.Header.Add(reqHeaders[0], reqHeaders[1])
+					} else {
+						continue
 					}
 
 					if clErr != nil {
