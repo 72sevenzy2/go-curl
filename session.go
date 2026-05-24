@@ -161,9 +161,14 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									pass = false
 									continue
 								}
-								bodyData = map[string]string{
-									"data": parts[i+3],
-								}
+
+									// collect all input (thats json)
+									newB := strings.Join(parts[i+3:], " ")
+
+									bodyData = map[string]string{
+										"data": newB,
+									}
+								
 
 								data, err := json.Marshal(bodyData)
 								if err != nil {
