@@ -155,11 +155,13 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									// validate if values exist
 									if i+3 >= len(parts) {
 										fmt.Println("please include actual data in json format.")
+										pass = false
 										continue
 									}
 									bodyData = map[string]string{
 										"data": parts[i+3],
-									}								
+									}
+								
 
 									data, err := json.Marshal(bodyData)
 									if err != nil {
@@ -186,6 +188,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									// validate if formParts is of correct length now (or will panic)
 									if len(formParts) < 2 || len(formParts) > 2 {
 										fmt.Println("please use the correct format.")
+										pass = false
 										continue
 									}
 
