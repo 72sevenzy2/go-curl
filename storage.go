@@ -7,7 +7,7 @@ import (
 )
 
 type Data struct {
-	data_storage map[string]string // using generics to support only types string and int as key name.
+	data_storage map[string]string 
 }
 
 // new db
