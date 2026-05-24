@@ -136,7 +136,9 @@ func StartSession(b *bufio.Scanner, store *Data) {
 								continue
 							}
 
-							if parts[i+1] == "POST" {
+							newReq := strings.ToUpper(parts[i+1])
+
+							if newReq == "POST" {
 								reqType = http.MethodPost
 
 								// validate if request body flag also exists aswell as its data
@@ -201,7 +203,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 								}
 
 							} else {
-								if parts[i+1] == "GET" {
+								if newReq == "GET" {
 									reqType = http.MethodGet
 								} else {
 									fmt.Println("invalid method type.")
