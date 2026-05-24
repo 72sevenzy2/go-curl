@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -147,7 +148,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									continue
 								}
 
-								uppercased1 := strings.ToUpper(parts[i+2]) // normalize parts[i+2]
+								uppercased1 := strings.ToUpper(parts[i+2]) // normalize parts[i+2] to uppercase upon input
 
 								if uppercased1 == "-D" { // for normal json data
 
@@ -158,14 +159,14 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									}
 									bodyData = map[string]string{
 										"data": parts[i+3],
-									}
+									}								
 
-									data, err := ToJson(bodyData)
+									data, err := json.Marshal(bodyData)
 									if err != nil {
 										fmt.Println(err.Error())
 										continue
 									} else {
-										jsonData = data
+										jsonData = string(data)
 									}
 
 								}
