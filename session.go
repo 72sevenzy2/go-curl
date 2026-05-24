@@ -93,215 +93,213 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				cl, clErr = http.NewRequest(http.MethodGet, val, nil)
 				// clErr is handled below, after flags are parsed and appropriate requests are made.
 
-				if ok {
-
-					// parse header arguments
-					for i := range len(parts) {
-						upc := strings.ToUpper(parts[i]) // normalize "-h" to all uppercase
-
-						if upc == "-H" {
-							// check if header values exist
-							if i+1 >= len(parts) {
-								fmt.Println("missing header values.")
-								continue
-							}
-
-							reqHeaders = strings.SplitN(parts[i+1], ":", 2) // splits headers as:
-							// for example: header1:value, splitN() would split it so:
-							// map[string]string{
-							// 	"header1",
-							//  "value",
-							// }
-
-							if len(reqHeaders) < 2 || len(reqHeaders) > 2 { // validate length of headers or it will panic during execution
-								fmt.Println("please include both header name and value.")
-								pass = false
-								break
-							} else {
-								continue // skip
-							}
-
-							// refactored above ^ (keeping this block for future reference)
-							// if reqHeaders[0] == "" && reqHeaders[1] == "" {
-							// 	// cl.Header.Add(headers[0], headers[1])
-							// 	continue
-							// }
-						}
-
-						// to check if argument is for req methods
-						if upc == "-X" {
-
-							// validate if values exist (GET or POST)
-							if i+1 >= len(parts) {
-								fmt.Println("missing argument values, consider either POST or GET.")
-								continue
-							}
-
-							newReq := strings.ToUpper(parts[i+1])
-
-							if newReq == "POST" {
-								reqType = http.MethodPost
-
-								// validate if request body flag also exists aswell as its data
-								if i+2 >= len(parts) {
-									fmt.Println("missing request body flag, consider: -d [data]")
-									continue
-								}
-
-								uppercased1 := strings.ToUpper(parts[i+2]) // normalize parts[i+2] to uppercase upon input
-
-								if uppercased1 == "-D" { // for normal json data
-
-									// validate if values exist
-									if i+3 >= len(parts) {
-										fmt.Println("please include actual data in json format.")
-										pass = false
-										continue
-									}
-									bodyData = map[string]string{
-										"data": parts[i+3],
-									}
-								
-
-									data, err := json.Marshal(bodyData)
-									if err != nil {
-										fmt.Println(err.Error())
-										continue
-									} else {
-										jsonData = string(data)
-									}
-
-								}
-
-								if uppercased1 == "-F" { // form mode
-									if i+3 >= len(parts) {
-										fmt.Println("please include the necessary form data with format: 'title:value'")
-										continue
-									}
-
-									formParts := strings.SplitN(parts[i+3], ":", 2) // needs to be in a format like so:
-									// "title:value", and strings.SplitN(...) would return:
-									// map[string]string{
-									//		"title": "value",
-									// }
-
-									// validate if formParts is of correct length now (or will panic)
-									if len(formParts) < 2 || len(formParts) > 2 {
-										fmt.Println("please use the correct format.")
-										pass = false
-										continue
-									}
-
-									bodyData = map[string]string{ // appending necessary deaails to body
-										"title": formParts[0],
-										"value": formParts[1],
-									}
-
-									// appending the form values
-									data := url.Values{}
-
-									data.Set(formParts[0], formParts[1])
-									enc := data.Encode() // encode
-
-									formBody = bytes.NewReader([]byte(enc))
-								}
-
-							} else {
-								if newReq == "GET" {
-									reqType = http.MethodGet
-								} else {
-									fmt.Println("invalid method type.")
-									continue
-								}
-							}
-						}
-
-					}
-
-					// small flag value to ensure headers dont overwrite eachother
-					isJsonH := false
-					isFormH := false
-
-					client := http.Client{}
-					// cl, err := http.NewRequest(reqType, val, nil) // new request
-					if jsonData != "" && reqType == http.MethodPost {
-						cl, clErr = http.NewRequest(reqType, val, strings.NewReader(jsonData))
-
-						// set content type to json after creating request
-						cl.Header.Add("Content-Type", "application/json")
-						isJsonH = true
-					} else {
-						if jsonData == "" && reqType == http.MethodPost { // meaning that its form related request body data
-							cl, clErr = http.NewRequest(reqType, val, formBody)
-
-							// setting appropriate header afterwards
-							cl.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-							isFormH = true
-						} else {
-							fmt.Println("invalid method.")
-							continue
-						}
-						if reqType == http.MethodGet { // standard get method
-							cl, clErr = http.NewRequest(http.MethodGet, val, nil)
-						}
-
-					}
-
-					if clErr != nil {
-						fmt.Println(clErr)
-						continue
-					}
-
-					if !pass {
-						continue
-					}
-
-					if len(reqHeaders) == 2 {
-						// attaching headers (only if json body data is not included)
-						if !isJsonH && !isFormH {
-							cl.Header.Add(reqHeaders[0], reqHeaders[1])
-						}
-					}
-
-					resp, err2 := client.Do(cl) // send the request to the url provided
-					if err2 == nil {
-						// shadow auth header from resp
-						clonedH := resp.Header.Clone()
-						clonedH.Del("authorization")
-
-						respB := resp.Body
-						// outputting
-						fmt.Println("response headers:")
-						// fmt.Println(clonedH)
-						for header, val := range clonedH {
-							fmt.Println("header:", header)
-							for _, v := range val {
-								fmt.Println("value:", v)
-								for range 5 {
-									fmt.Print("-")
-								}
-							}
-						}
-						for range 10 {
-							fmt.Print("-") // seperator for headers and resp body so its easier to read
-						}
-						body, err := io.ReadAll(respB) // read respB bytes
-						if err != nil {
-							continue // skip current iteration if no body
-						} else {
-							fmt.Println("\nresponse body:")
-							for range 10 {
-								fmt.Print("-")
-							}
-							fmt.Println("\n", string(body))
-						}
-						respB.Close() // close after reading response
-					}
-
-				} else { // if key does not exit
+				if !ok { // key does not exist
 					fmt.Println("variable does not exit, consider setting one.")
 					continue
 				}
+
+				// parse header arguments
+				for i := range len(parts) {
+					upc := strings.ToUpper(parts[i]) // normalize "-h" to all uppercase
+
+					if upc == "-H" {
+						// check if header values exist
+						if i+1 >= len(parts) {
+							fmt.Println("missing header values.")
+							continue
+						}
+
+						reqHeaders = strings.SplitN(parts[i+1], ":", 2) // splits headers as:
+						// for example: header1:value, splitN() would split it so:
+						// map[string]string{
+						// 	"header1",
+						//  "value",
+						// }
+
+						if len(reqHeaders) < 2 || len(reqHeaders) > 2 { // validate length of headers or it will panic during execution
+							fmt.Println("please include both header name and value.")
+							pass = false
+							break
+						} else {
+							continue // skip
+						}
+
+						// refactored above ^ (keeping this block for future reference)
+						// if reqHeaders[0] == "" && reqHeaders[1] == "" {
+						// 	// cl.Header.Add(headers[0], headers[1])
+						// 	continue
+						// }
+					}
+
+					// to check if argument is for req methods
+					if upc == "-X" {
+
+						// validate if values exist (GET or POST)
+						if i+1 >= len(parts) {
+							fmt.Println("missing argument values, consider either POST or GET.")
+							continue
+						}
+
+						newReq := strings.ToUpper(parts[i+1])
+
+						if newReq == "POST" {
+							reqType = http.MethodPost
+
+							// validate if request body flag also exists aswell as its data
+							if i+2 >= len(parts) {
+								fmt.Println("missing request body flag, consider: -d [data]")
+								continue
+							}
+
+							uppercased1 := strings.ToUpper(parts[i+2]) // normalize parts[i+2] to uppercase upon input
+
+							if uppercased1 == "-D" { // for normal json data
+
+								// validate if values exist
+								if i+3 >= len(parts) {
+									fmt.Println("please include actual data in json format.")
+									pass = false
+									continue
+								}
+								bodyData = map[string]string{
+									"data": parts[i+3],
+								}
+
+								data, err := json.Marshal(bodyData)
+								if err != nil {
+									fmt.Println(err.Error())
+									continue
+								} else {
+									jsonData = string(data)
+								}
+
+							}
+
+							if uppercased1 == "-F" { // form mode
+								if i+3 >= len(parts) {
+									fmt.Println("please include the necessary form data with format: 'title:value'")
+									continue
+								}
+
+								formParts := strings.SplitN(parts[i+3], ":", 2) // needs to be in a format like so:
+								// "title:value", and strings.SplitN(...) would return:
+								// map[string]string{
+								//		"title": "value",
+								// }
+
+								// validate if formParts is of correct length now (or will panic)
+								if len(formParts) < 2 || len(formParts) > 2 {
+									fmt.Println("please use the correct format.")
+									pass = false
+									continue
+								}
+
+								bodyData = map[string]string{ // appending necessary deaails to body
+									"title": formParts[0],
+									"value": formParts[1],
+								}
+
+								// appending the form values
+								data := url.Values{}
+
+								data.Set(formParts[0], formParts[1])
+								enc := data.Encode() // encode
+
+								formBody = bytes.NewReader([]byte(enc))
+							}
+
+						} else {
+							if newReq == "GET" {
+								reqType = http.MethodGet
+							} else {
+								fmt.Println("invalid method type.")
+								continue
+							}
+						}
+					}
+
+				}
+
+				// small flag value to ensure headers dont overwrite eachother
+				isJsonH := false
+				isFormH := false
+
+				client := http.Client{}
+				// cl, err := http.NewRequest(reqType, val, nil) // new request
+				if jsonData != "" && reqType == http.MethodPost {
+					cl, clErr = http.NewRequest(reqType, val, strings.NewReader(jsonData))
+
+					// set content type to json after creating request
+					cl.Header.Add("Content-Type", "application/json")
+					isJsonH = true
+				} else {
+					if jsonData == "" && reqType == http.MethodPost { // meaning that its form related request body data
+						cl, clErr = http.NewRequest(reqType, val, formBody)
+
+						// setting appropriate header afterwards
+						cl.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+						isFormH = true
+					} else {
+						fmt.Println("invalid method.")
+						continue
+					}
+					if reqType == http.MethodGet { // standard get method
+						cl, clErr = http.NewRequest(http.MethodGet, val, nil)
+					}
+
+				}
+
+				if clErr != nil {
+					fmt.Println(clErr)
+					continue
+				}
+
+				if !pass {
+					continue
+				}
+
+				if len(reqHeaders) == 2 {
+					// attaching headers (only if json body data is not included)
+					if !isJsonH && !isFormH {
+						cl.Header.Add(reqHeaders[0], reqHeaders[1])
+					}
+				}
+
+				resp, err2 := client.Do(cl) // send the request to the url provided
+				if err2 == nil {
+					// shadow auth header from resp
+					clonedH := resp.Header.Clone()
+					clonedH.Del("authorization")
+
+					respB := resp.Body
+					// outputting
+					fmt.Println("response headers:")
+					// fmt.Println(clonedH)
+					for header, val := range clonedH {
+						fmt.Println("header:", header)
+						for _, v := range val {
+							fmt.Println("value:", v)
+							for range 5 {
+								fmt.Print("-")
+							}
+						}
+					}
+					for range 10 {
+						fmt.Print("-") // seperator for headers and resp body so its easier to read
+					}
+					body, err := io.ReadAll(respB) // read respB bytes
+					if err != nil {
+						continue // skip current iteration if no body
+					} else {
+						fmt.Println("\nresponse body:")
+						for range 10 {
+							fmt.Print("-")
+						}
+						fmt.Println("\n", string(body))
+					}
+					respB.Close() // close after reading response
+				}
+
 			}
 
 		// for exiting
