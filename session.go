@@ -239,9 +239,6 @@ func StartSession(b *bufio.Scanner, store *Data) {
 						// setting appropriate header afterwards
 						cl.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 						isFormH = true
-					} else {
-						fmt.Println("invalid method.")
-						continue
 					}
 					if reqType == http.MethodGet { // standard get method
 						cl, clErr = http.NewRequest(http.MethodGet, val, nil)
