@@ -152,9 +152,8 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 							uppercased1 := strings.ToUpper(parts[i+2]) // normalize parts[i+2] to uppercase upon input
 
-							
 							if uppercased1 == "-D" { // for normal json data
-							
+
 								// validate if values exist
 								if i+3 >= len(parts) {
 									fmt.Println("please include actual data in json format.")
@@ -163,11 +162,10 @@ func StartSession(b *bufio.Scanner, store *Data) {
 								}
 								// collect all input after parts[i+3]
 								newB := strings.Join(parts[i+3:], " ")
-								
+
 								bodyData = map[string]string{
-										"data": newB,
-									}
-								
+									"data": newB,
+								}
 
 								data, err := json.Marshal(bodyData)
 								if err != nil {
@@ -267,38 +265,41 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				}
 
 				resp, err2 := client.Do(cl) // send the request to the url provided
-				if err2 == nil {
-					// shadow auth header from resp
-					clonedH := resp.Header.Clone()
-					clonedH.Del("authorization")
+				if err2 != nil {
+					fmt.Println(err2.Error())
+					continue
+				}
 
-					respB := resp.Body
-					// outputting
-					fmt.Println("response headers:")
-					// fmt.Println(clonedH)
-					for header, val := range clonedH {
-						fmt.Println("header:", header)
-						for _, v := range val {
-							fmt.Println("value:", v)
-							for range 5 {
-								fmt.Print("-")
-							}
-						}
-					}
-					for range 10 {
-						fmt.Print("-") // seperator for headers and resp body so its easier to read
-					}
-					body, err := io.ReadAll(respB) // read respB bytes
-					if err != nil {
-						continue // skip current iteration if no body
-					} else {
-						fmt.Println("\nresponse body:")
-						for range 10 {
+				// shadow auth header from resp
+				clonedH := resp.Header.Clone()
+				clonedH.Del("authorization")
+
+				respB := resp.Body
+				// outputting
+				fmt.Println("response headers:")
+				// fmt.Println(clonedH)
+				for header, val := range clonedH {
+					fmt.Println("header:", header)
+					for _, v := range val {
+						fmt.Println("value:", v)
+						for range 5 {
 							fmt.Print("-")
 						}
-						fmt.Println("\n", string(body))
 					}
-					respB.Close() // close after reading response
+				}
+				for range 10 {
+					fmt.Print("-") // seperator for headers and resp body so its easier to read
+				}
+				body, err := io.ReadAll(respB) // read respB bytes
+				respB.Close() // close after reading response
+				if err != nil {
+					continue // skip current iteration if no body
+				} else {
+					fmt.Println("\nresponse body:")
+					for range 10 {
+						fmt.Print("-")
+					}
+					fmt.Println("\n", string(body))
 				}
 
 			}
