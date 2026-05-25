@@ -69,8 +69,8 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 				//  utility variables
 				var (
-					pass     bool // determine whether final output block runs
-					reqType  string
+					pass    bool // determine whether final output block runs
+					reqType string
 					// bodyData map[string]string
 					jsonData string
 				)
@@ -162,11 +162,10 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									pass = false
 									continue
 								}
-								
-								
+
 								// collect all input after parts[i+3]
 								// whilst also removing "\"
-								cleaned := strings.ReplaceAll(strings.ReplaceAll(strings.Join(parts[i+3:], ""), " ", ""), "\\", "");
+								cleaned := strings.ReplaceAll(strings.ReplaceAll(strings.Join(parts[i+3:], ""), " ", ""), "\\", "")
 
 								// assign jsonData to cleaned
 								jsonData = cleaned
@@ -283,7 +282,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					fmt.Print("-") // seperator for headers and resp body so its easier to read
 				}
 				body, err := io.ReadAll(respB) // read respB bytes
-				respB.Close() // close after reading response
+				respB.Close()                  // close after reading response
 				if err != nil {
 					continue // skip current iteration if no body
 				} else {
@@ -300,6 +299,10 @@ func StartSession(b *bufio.Scanner, store *Data) {
 		case "EXIT":
 			fmt.Println("exiting will remove saved variables.")
 			return
+
+		default:
+			fmt.Println("not a valid command.")
+			continue
 		}
 	}
 }
