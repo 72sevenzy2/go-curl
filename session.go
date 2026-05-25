@@ -31,6 +31,10 @@ func StartSession(b *bufio.Scanner, store *Data) {
 		switch upperInput {
 		// declare variables (can be to store headers, urls, etc)
 		case "VAR":
+			if len(parts) < 3 || len(parts) > 3 { // validate arguments
+				fmt.Println("please consider the correct format: var <KeyName> <KeyValue>")
+			}
+
 			err, ok := store.Set(parts[1], parts[2])
 			if err != nil && !ok {
 				fmt.Println(err.Error())
@@ -39,6 +43,11 @@ func StartSession(b *bufio.Scanner, store *Data) {
 			fmt.Println("successful.")
 			continue
 		case "GET":
+			if len(parts) < 2 || len(parts) > 2 {
+				fmt.Println("please use the correct format: get <KeyName>")
+				continue
+			}
+
 			val, ok, err := store.Get(parts[1])
 			if err != nil && !ok {
 				fmt.Println(err.Error())
@@ -47,6 +56,11 @@ func StartSession(b *bufio.Scanner, store *Data) {
 			fmt.Println(val)
 
 		case "DEL":
+			if len(parts) < 2 || len(parts) > 2 { // validate if parts[1] (key) only is included in input
+				fmt.Println("please use the correct format: del <KeyName>")
+				continue
+			}
+
 			err, ok := store.Del(parts[1])
 			if !ok && err != nil {
 				fmt.Println(err.Error())
