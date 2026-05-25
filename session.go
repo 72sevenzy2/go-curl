@@ -65,10 +65,9 @@ func StartSession(b *bufio.Scanner, store *Data) {
 			if ok {
 				fmt.Println("deleted key.")
 				continue
-			} else {
-				fmt.Println("key does not exist.")
-				continue
 			}
+			fmt.Println("key does not exist.")
+			continue
 
 		// actual api testing logic (GET only for now)
 		case "TEST":
@@ -79,6 +78,11 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				val, ok, err := store.Get(parts[1]) // check if parts[1] exists as a var first
 				if err != nil {
 					fmt.Println(err.Error())
+					continue
+				}
+
+				if !ok { // key does not exist
+					fmt.Println("variable does not exit, consider setting one.")
 					continue
 				}
 
@@ -106,13 +110,8 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				cl, clErr = http.NewRequest(http.MethodGet, val, nil)
 				// clErr is handled below, after flags are parsed and appropriate requests are made.
 
-				if !ok { // key does not exist
-					fmt.Println("variable does not exit, consider setting one.")
-					continue
-				}
-
 				// parse header arguments
-				for i := range len(parts) {
+				for i := range parts {
 					upc := strings.ToUpper(parts[i]) // normalize "-h" to all uppercase
 
 					if upc == "-H" {
@@ -134,9 +133,8 @@ func StartSession(b *bufio.Scanner, store *Data) {
 							fmt.Println("please include both header name and value.")
 							pass = false
 							break
-						} else {
-							continue // skip
 						}
+						continue // skip
 
 						// refactored above ^ (keeping this block for future reference)
 						// if reqHeaders[0] == "" && reqHeaders[1] == "" {
