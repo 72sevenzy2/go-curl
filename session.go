@@ -69,7 +69,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 				//  utility variables
 				var (
-					pass     bool
+					pass     bool // determine whether final output block runs
 					reqType  string
 					// bodyData map[string]string
 					jsonData string
@@ -104,6 +104,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 						// check if header values exist
 						if i+1 >= len(parts) {
 							fmt.Println("missing header values.")
+							pass = false
 							continue
 						}
 
@@ -135,6 +136,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 						// validate if values exist (GET or POST)
 						if i+1 >= len(parts) {
 							fmt.Println("missing argument values, consider either POST or GET.")
+							pass = false
 							continue
 						}
 
@@ -146,6 +148,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 							// validate if request body flag also exists aswell as its data
 							if i+2 >= len(parts) {
 								fmt.Println("missing request body flag, consider: -d [data]")
+								pass = false
 								continue
 							}
 
@@ -173,6 +176,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 							if uppercased1 == "-F" { // form mode
 								if i+3 >= len(parts) {
 									fmt.Println("please include the necessary form data with format: 'title:value'")
+									pass = false
 									continue
 								}
 
