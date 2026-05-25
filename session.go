@@ -159,11 +159,11 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									pass = false
 									continue
 								}
-								// collect all input after parts[i+3]
-								newB := strings.Join(parts[i+3:], "")
 								
-								// remove \ in newB
-								cleaned := strings.ReplaceAll(strings.ReplaceAll(newB, " ", ""), "\\", "");
+								
+								// collect all input after parts[i+3]
+								// whilst also removing "\"
+								cleaned := strings.ReplaceAll(strings.ReplaceAll(strings.Join(parts[i+3:], ""), " ", ""), "\\", "");
 
 								// assign jsonData to cleaned
 								jsonData = cleaned
