@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -74,7 +73,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					pass     bool
 					reqType  string
 					bodyData map[string]string
-					jsonData string
+					jsonData []byte
 				)
 				pass = true
 
@@ -153,19 +152,19 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 							uppercased1 := strings.ToUpper(parts[i+2]) // normalize parts[i+2] to uppercase upon input
 
+							
 							if uppercased1 == "-D" { // for normal json data
-
+							
 								// validate if values exist
 								if i+3 >= len(parts) {
 									fmt.Println("please include actual data in json format.")
 									pass = false
 									continue
 								}
-
-									// collect all input (thats json)
-									newB := strings.Join(parts[i+3:], " ")
-
-									bodyData = map[string]string{
+								// collect all input after parts[i+3]
+								newB := strings.Join(parts[i+3:], " ")
+								
+								bodyData = map[string]string{
 										"data": newB,
 									}
 								
@@ -175,7 +174,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									fmt.Println(err.Error())
 									continue
 								} else {
-									jsonData = string(data)
+									jsonData = data
 								}
 
 							}
@@ -210,7 +209,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 								data.Set(formParts[0], formParts[1])
 								enc := data.Encode() // encode
 
-								formBody = bytes.NewReader([]byte(enc))
+								formBody = strings.NewReader(enc)
 							}
 
 						} else {
@@ -231,14 +230,14 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 				client := http.Client{}
 				// cl, err := http.NewRequest(reqType, val, nil) // new request
-				if jsonData != "" && reqType == http.MethodPost {
-					cl, clErr = http.NewRequest(reqType, val, strings.NewReader(jsonData))
+				if len(jsonData) != 0 && reqType == http.MethodPost {
+					cl, clErr = http.NewRequest(reqType, val, strings.NewReader(string(jsonData)))
 
 					// set content type to json after creating request
 					cl.Header.Add("Content-Type", "application/json")
 					isJsonH = true
 				} else {
-					if jsonData == "" && reqType == http.MethodPost { // meaning that its form related request body data
+					if len(jsonData) == 0 && reqType == http.MethodPost { // meaning that its form related request body data
 						cl, clErr = http.NewRequest(reqType, val, formBody)
 
 						// setting appropriate header afterwards
