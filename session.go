@@ -162,9 +162,12 @@ func StartSession(b *bufio.Scanner, store *Data) {
 								}
 								// collect all input after parts[i+3]
 								newB := strings.Join(parts[i+3:], " ")
+								
+								// remove \ in newB
+								cleaned := strings.ReplaceAll(newB, "\\", "");
 
 								bodyData = map[string]string{
-									"data": newB,
+									"data": cleaned,
 								}
 
 								data, err := json.Marshal(bodyData)
