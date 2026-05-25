@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -72,8 +71,8 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				var (
 					pass     bool
 					reqType  string
-					bodyData map[string]string
-					jsonData []byte
+					// bodyData map[string]string
+					jsonData string
 				)
 				pass = true
 
@@ -161,22 +160,13 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									continue
 								}
 								// collect all input after parts[i+3]
-								newB := strings.Join(parts[i+3:], " ")
+								newB := strings.Join(parts[i+3:], "")
 								
 								// remove \ in newB
-								cleaned := strings.ReplaceAll(newB, "\\", "");
+								cleaned := strings.ReplaceAll(strings.ReplaceAll(newB, " ", ""), "\\", "");
 
-								bodyData = map[string]string{
-									"data": cleaned,
-								}
-
-								data, err := json.Marshal(bodyData)
-								if err != nil {
-									fmt.Println(err.Error())
-									continue
-								} else {
-									jsonData = data
-								}
+								// assign jsonData to cleaned
+								jsonData = cleaned
 
 							}
 
@@ -197,11 +187,6 @@ func StartSession(b *bufio.Scanner, store *Data) {
 									fmt.Println("please use the correct format.")
 									pass = false
 									continue
-								}
-
-								bodyData = map[string]string{ // appending necessary deaails to body
-									"title": formParts[0],
-									"value": formParts[1],
 								}
 
 								// appending the form values
@@ -231,14 +216,14 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 				client := http.Client{}
 				// cl, err := http.NewRequest(reqType, val, nil) // new request
-				if len(jsonData) != 0 && reqType == http.MethodPost {
-					cl, clErr = http.NewRequest(reqType, val, strings.NewReader(string(jsonData)))
+				if jsonData != "" && reqType == http.MethodPost {
+					cl, clErr = http.NewRequest(reqType, val, strings.NewReader(jsonData))
 
 					// set content type to json after creating request
 					cl.Header.Add("Content-Type", "application/json")
 					isJsonH = true
 				} else {
-					if len(jsonData) == 0 && reqType == http.MethodPost { // meaning that its form related request body data
+					if jsonData == "" && reqType == http.MethodPost { // meaning that its form related request body data
 						cl, clErr = http.NewRequest(reqType, val, formBody)
 
 						// setting appropriate header afterwards
