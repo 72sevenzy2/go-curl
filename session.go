@@ -61,12 +61,13 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				continue
 			}
 
-			err, ok := store.Del(parts[1])
-			if !ok && err != nil {
-				fmt.Println(err.Error())
+			ok := store.Del(parts[1])
+			if ok {
+				fmt.Println("deleted key.")
 				continue
 			} else {
-				fmt.Println("deleted key.")
+				fmt.Println("key does not exist.")
+				continue
 			}
 
 		// actual api testing logic (GET only for now)
