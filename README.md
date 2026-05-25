@@ -103,5 +103,6 @@
     <code> TEST [VarName] [-x POST  -F [title:value]] </code>
 </h3>
 <h4 align="center">and make sure you use the exact format as shown, (title:value).</h4>
+<h4 align="center">also important, you can include multiple flag options at once when testing (except -F and -D for -x POST).</h4>
 
 <h4 align="center">important to note, VarName should be a variable assigned with a valid url, however for the purpose of session mode, you can store headers/body data/urls in variables to utilise them when running the TEST cmd.</h4>
