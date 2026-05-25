@@ -45,12 +45,17 @@ func (d *Data) Set(keyname any, value string) (error, bool) {
 }
 
 // del func
-func (d *Data) Del(keyname any) (error, bool) {
+func (d *Data) Del(keyname any) bool {
 	newk, err := Normalize(keyname)
-	if err == nil {
+	if err != nil {
+		return false
+	}
+
+	// check if key exists first.
+	if _, v := d.data_storage[newk]; v {
 		delete(d.data_storage, newk)
-		return nil, true
+		return true
 	} else {
-		return errors.New("key does not exist."), false
+		return false
 	}
 }

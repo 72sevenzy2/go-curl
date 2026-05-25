@@ -79,7 +79,30 @@
 </h3>
 <br>
 <h3 align="center">using the variables you stored for API testing:</h3>
+
+<h4 align="center">(for standard get requests):</h4>
 <h3 align="center">
     <code> TEST [VarName] </code>
 </h3>
-<h4 align="center">however, VarName needs to be a valid url for it to work. As of now TEST cmd only supports urls as arguments and tests it using an GET request, (will be extending later on for more compatability such as setting headers, post requests and such).</h4>
+
+<h4 align="center">if you a custom header aswell, do so in the following format:</h4>
+<h3 align="center">
+    <code> TEST [VarName] [-h headerName:value] </code>
+</h3>
+
+<h4 align="center">you can also make POST/GET requests as so:</h4>
+<h3 align="center">
+    <code> TEST [VarName] [-x GET] </code>
+</h3>
+<h4 align="center">and post request like so:</h4>
+<h3 align="center">
+    <code> TEST [VarName] [-x POST -D [bodyData]] </code>
+</h3>
+<h4 align="center">for post requests, when setting a request body you can do -F for form related data, or -D for normal json data as shown above, you can use the -F flag like so:</h4>
+<h3 align="center">
+    <code> TEST [VarName] [-x POST  -F [title:value]] </code>
+</h3>
+<h4 align="center">and make sure you use the exact format as shown, (title:value).</h4>
+<h4 align="center">also important, you can include multiple flag options at once when testing (except -F and -D for -x POST).</h4>
+
+<h4 align="center">important to note, VarName should be a variable assigned with a valid url, however for the purpose of session mode, you can store headers/body data/urls in variables to utilise them when running the TEST cmd.</h4>
