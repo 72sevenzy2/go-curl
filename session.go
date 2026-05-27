@@ -308,6 +308,15 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 			}
 
+		case "HELP":
+			fmt.Println("usage:")
+			fmt.Println("var <VarName> <Value>")
+			fmt.Println("to retrieve values:")
+			fmt.Println("get <VarName>")
+			fmt.Println("to test API's:")
+			fmt.Println("test <VarName> -H content-type:application -X post -D { 'name': 'name' } or -X post -F <formTitle:formValue>")
+			fmt.Println("though flags shown above are optional, but make sure <VarName> is a valid url.")
+			continue
 		// for exiting
 		case "EXIT":
 			fmt.Println("exiting will remove saved variables.")
