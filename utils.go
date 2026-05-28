@@ -40,13 +40,13 @@ func AddHeaders(req *http.Request, args HeaderFlags) error {
 }
 
 // normalize key types to string (for storage.go)
-func Normalize(keyname any) (string, error) {
+func Normalize(keyname any) string {
 	switch v := keyname.(type) {
 	case int:
-		return strconv.Itoa(v), nil
+		return strconv.Itoa(v)
 	case string:
-		return v, nil
+		return v
 	default:
-		return "", errors.New("invalid type: consider only string or int.")
+		return ""
 	}
 }
