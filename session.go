@@ -35,8 +35,8 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				fmt.Println("please consider the correct format: var <KeyName> <KeyValue>")
 			}
 
-			err, ok := store.Set(parts[1], parts[2])
-			if err != nil && !ok {
+			err := store.Set(parts[1], parts[2])
+			if err != nil {
 				fmt.Println(err.Error())
 				continue
 			}
@@ -48,8 +48,8 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				continue
 			}
 
-			val, ok, err := store.Get(parts[1])
-			if err != nil && !ok {
+			val, err := store.Get(parts[1])
+			if err != nil {
 				fmt.Println(err.Error())
 				continue
 			}
@@ -61,28 +61,24 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				continue
 			}
 
-			ok := store.Del(parts[1])
-			if ok {
-				fmt.Println("deleted key.")
+			err := store.Del(parts[1])
+			if err != nil {
+				fmt.Println(err.Error())
 				continue
 			}
-			fmt.Println("key does not exist.")
+
+			fmt.Println("deleted key.")
 			continue
 
-		// actual api testing logic (GET only for now)
+			// actual api testing logic (GET only for now)
 		case "TEST":
 			if len(parts) < 2 { // validate arguments before continuing (other it will panic)
 				fmt.Println("variable as second argument does not exit, consider setting a var.")
 				continue
 			} else {
-				val, ok, err := store.Get(parts[1]) // check if parts[1] exists as a var first
+				val, err := store.Get(parts[1]) // check if parts[1] exists as a var first
 				if err != nil {
 					fmt.Println(err.Error())
-					continue
-				}
-
-				if !ok { // key does not exist
-					fmt.Println("variable does not exit, consider setting one.")
 					continue
 				}
 
