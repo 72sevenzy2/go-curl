@@ -20,44 +20,39 @@ func NewStore() *Data {
 // utility get/set functions for data map:
 
 // for both strings and ints
-func (d *Data) Get(keyname any) (string, bool, error) {
-	newKey, err := Normalize(keyname)
-	if err != nil {
-		return "", false, err
-	}
+func (d *Data) Get(keyname any) (string, error) {
+	newKey := Normalize(keyname)
 
 	val, ok := d.data_storage[newKey]
-	return val, ok, nil
+	if !ok {
+		return "", errors.New("key does not exist.")
+	}
+
+	return val, nil
 }
 
-func (d *Data) Set(keyname any, value string) (error, bool) {
-	if value == "" {
-		errM := errors.New("please include a value")
-		return errM, false
+func (d *Data) Set(keyname any, value string) error {
+	if len(value) == 1 {
+		return errors.New("please include a value thats over 1 character.")
 	}
 
-	newK, err := Normalize(keyname)
-	if err != nil {
-		return err, false
-	}
+	newK := Normalize(keyname)
+
 	d.data_storage[newK] = value
-	return nil, true
+	return nil
 }
 
 // del func
-func (d *Data) Del(keyname any) bool {
-	newk, err := Normalize(keyname)
-	if err != nil {
-		return false
-	}
+func (d *Data) Del(keyname any) error {
+	newk := Normalize(keyname)
 
 	// check if key exists first.
 	if _, v := d.data_storage[newk]; v {
 		delete(d.data_storage, newk)
-		return true
-	} else {
-		return false
+		return nil
 	}
+	// else
+	return errors.New("key does not exist.")
 }
 
 // func to get all values from data_storage

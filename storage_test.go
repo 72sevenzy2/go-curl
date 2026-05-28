@@ -7,30 +7,28 @@ import (
 
 func TestStorage(t *testing.T) {
 	store := NewStore()
-	_, ok := store.Set(1, "test")
-	if ok {
+	er := store.Set(1, "test")
+	if er == nil {
 		fmt.Println("data set successfully")
-	} else {
-		fmt.Println("could not save data")
 	}
+	fmt.Println("could not save data")
 
 	k := store.Del(1)
-	if !k {
+	if k != nil {
 		fmt.Println("key does no exist.")
 	}
 
-	val, exists, _ := store.Get(1)
-	if exists {
+	val, err1 := store.Get(1)
+	if err1 == nil {
 		fmt.Println("data exists:", val)
-	} else {
-		fmt.Println("couldnt retrieve data") // expected output for del testing
 	}
+	fmt.Println("couldnt retrieve data") // expected output for del testing
 
-	_, ok2 := store.Set("test", "hi");
-	if !ok2 {
+	err3 := store.Set("test", "hi")
+	if err3 != nil {
 		fmt.Println("couldnt set data.")
 	}
-	
+
 	vals, ok3 := store.GetAll()
 	if !ok3 {
 		fmt.Println("not vars set.")
