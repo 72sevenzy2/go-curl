@@ -47,7 +47,6 @@ func Normalize(keyname any) (string, error) {
 	case string:
 		return v, nil
 	default:
-		errms := errors.New("invalid type: consider only string or int.")
-		return "", errms
+		return "", errors.New("invalid type: consider only string or int.")
 	}
 }
