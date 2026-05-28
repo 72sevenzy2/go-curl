@@ -7,7 +7,7 @@ import (
 )
 
 type Data struct {
-	data_storage map[string]string 
+	data_storage map[string]string
 }
 
 // new db
@@ -58,4 +58,17 @@ func (d *Data) Del(keyname any) bool {
 	} else {
 		return false
 	}
+}
+
+// func to get all values from data_storage
+func (d *Data) GetAll() (map[string]string, bool) {
+	res := make(map[string]string, len(d.data_storage)) // initialise the size as number of elements in data_storage to reduce size allocated for this map
+
+	if len(d.data_storage) != 0 {
+		for v, i := range d.data_storage {
+			res[i] = v
+			return res, true
+		}
+	}
+	return nil, false
 }
