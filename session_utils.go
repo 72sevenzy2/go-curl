@@ -261,22 +261,23 @@ type WorkerConfig struct {
 
 func NewWorker(v *WorkerConfig) {
 	resp, err := v.Client.Do(v.Req)
-
-	// shadowing sensitive header values.
-	clonedHeaders := resp.Header.Clone()
-	clonedHeaders.Del("authorization")
+	var clonedHeaders http.Header
 
 	if err != nil {
 		v.Results <- Result{
 			ReqHeaders:    clonedHeaders,
 			Body:          "",
 			Error:         err,
-			ReqPath:       resp.Request.URL.Path,
-			ReqStatusCode: resp.StatusCode,
-			ReqMethod:     resp.Request.Method,
+			ReqPath:       v.Req.URL.Path,
+			ReqStatusCode: 0,
+			ReqMethod:     v.Req.Method,
 		}
+		return
 	}
 
+	// shadowing sensitive header values.
+	clonedHeaders = resp.Header.Clone()
+	clonedHeaders.Del("authorization")
 	body, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil { // no body
@@ -288,6 +289,7 @@ func NewWorker(v *WorkerConfig) {
 			ReqStatusCode: resp.StatusCode,
 			ReqMethod:     resp.Request.Method,
 		}
+		return
 	}
 	v.Results <- Result{
 		ReqHeaders:    clonedHeaders,
@@ -319,9 +321,7 @@ func InitSpamConfig() *SpamConf {
 
 // spam cmd modularization:
 
-func ExtractSpamUrl(parts []string, store *Data) bool {
-	conf := &SpamConf{} // modify config directly
-
+func ExtractSpamUrl(parts []string, store *Data, conf *SpamConf) bool {
 	if len(parts) <= 1 {
 		fmt.Println("please include a url.")
 		return false
@@ -343,9 +343,9 @@ func HandleSpamGet(remainingArgs []string, conf *SpamConf, store *Data) bool {
 		return false
 	}
 
-	for i := range len(remainingArgs) {
+	for i := 0; i < len(remainingArgs); i++ {
 		switch strings.ToUpper(remainingArgs[i]) {
-		case "-D":
+		case "-C":
 			if len(remainingArgs) <= i+1 {
 				fmt.Println("please include a value for -C.")
 				continue
@@ -388,7 +388,7 @@ func HandleSpamPost(remainingArgs []string, conf *SpamConf, store *Data) bool {
 	for i := range len(remainingArgs) {
 		switch strings.ToUpper(remainingArgs[i]) {
 		case "-C":
-			if len(remainingArgs) <= i+1 { 
+			if len(remainingArgs) <= i+1 {
 				fmt.Println("please include a value for -C.")
 				return false
 			}
@@ -401,8 +401,6 @@ func HandleSpamPost(remainingArgs []string, conf *SpamConf, store *Data) bool {
 				temp = remainingArgs[i+1]
 			}
 
-
-
 			s := strings.Trim(temp, "\"")
 			d, err := strconv.Atoi(s)
 			if err != nil {
@@ -413,7 +411,7 @@ func HandleSpamPost(remainingArgs []string, conf *SpamConf, store *Data) bool {
 			conf.reqCap = d
 			i++
 
-			case "-D":
+		case "-D":
 			if len(remainingArgs) <= i+1 {
 				fmt.Println("please include a value for -D.")
 				return false

@@ -26,7 +26,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 			continue // skip current iteration if no input
 		}
 
-		upperInput := strings.ToUpper(parts[0]) // "VAR", "GET", "DEL", "EXIT"
+		upperInput := strings.ToUpper(parts[0])
 
 		switch upperInput {
 		// declare variables (can be to store headers, urls, etc)
@@ -217,7 +217,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 		case "SPAM":
 			conf := InitSpamConfig()
 
-			ok := ExtractSpamUrl(parts, store) // conf.reqUrl would hold url
+			ok := ExtractSpamUrl(parts, store, conf) // conf.reqUrl would hold url
 			if !ok {
 				continue
 			}

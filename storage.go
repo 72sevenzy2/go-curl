@@ -20,11 +20,8 @@ func NewStore() *Data {
 
 // utility get/set functions for data map:
 
-// for both strings and ints
-func (d *Data) Get(keyname any) (string, error) {
-	newKey := Normalize(keyname)
-
-	val, ok := d.data_storage[newKey]
+func (d Data) Get(keyname any) (string, error) {
+	val, ok := d.data_storage[Normalize(keyname)]
 	if !ok {
 		return "", errors.New("key does not exist.")
 	}
